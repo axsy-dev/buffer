@@ -336,7 +336,14 @@ Buffer.concat = function concat (list, length) {
   var pos = 0
   for (i = 0; i < list.length; i++) {
     var item = list[i]
-    item.copy(buf, pos)
+    if (typeof item.copy === 'undefined') { //tbd how we got here in this state
+      //console.log("Buffer.concat patching for " + Object.prototype.toString.call(item)); // '[object Uint8Array]'
+      for (var j = 0; j < item.length && (pos + j) < length; ++j) {
+          buf[pos + j] = item[j];
+      }
+    } else {
+      item.copy(buf, pos)
+    }
     pos += item.length
   }
   return buf
